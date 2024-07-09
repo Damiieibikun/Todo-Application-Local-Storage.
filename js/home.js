@@ -300,13 +300,11 @@ $(document).ready(() => {
   $(document).on("click", ".delete-tag-icon", function () {
     $(this).css("display", "none");
     $(this).prev().css("display", "none");
-    let chosenID = $(this).parent().prev().prev().data("id");
     let selectedTag = $(this).parent().prev().text();
     let selectedColor = $(this).parent().prev().prev().css("background-color");
- 
-        // console.log(data);
-        console.log(user.todoInfo.todoTasks.colors)
-        if (user.todoInfo.todoTasks.colors.length > 0) {
+    // console.log(selectedColor)
+    user.todoInfo.todoTasks.forEach((task, i)=>{
+      if(task.colors.includes(selectedColor)){
           $("#delete-task").css("display", "flex");
           $("#delete-task-details-info").html(`
             <div id="error-delete-cat">
@@ -324,14 +322,25 @@ $(document).ready(() => {
           $("#delete-category-form").on("submit", function (e) {
             e.preventDefault();
          console.log('delete item')
+         user.todoInfo.todoTasks.splice(i, 1)
+         updateLocalStorage()
             $("#delete-categories").hide();
           });
         }
-   
+    }) 
+          
   });
     
     
-    
+      // close delete task modal
+  $("#close-delete-task").on("click", function () {
+    $("#delete-task").hide();
+  });
+
+    // close delete category modal
+    $("#close-delete").on("click", function () {
+      $("#delete-categories").hide();
+    });
     
     
     
