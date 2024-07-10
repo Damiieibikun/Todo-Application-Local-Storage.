@@ -115,7 +115,7 @@ $(document).ready(() => {
     
           let category = $("#category-input").val();
           let color = $("#color-picker").val();
-          user.todoInfo.categories.push({ category: category, color: color });
+          user.todoInfo.categories.push({ category: category.toLowerCase(), color: color });
           updateLocalStorage()            
           $("#category-form")[0].reset();
           $("#add-new-task").css("display", "flex");
@@ -188,9 +188,12 @@ $(document).ready(() => {
           let taskTitle = $("#task-title").val();
           let taskDescription = $("#task-details").val();
           let chosenColorsTask = [];
+          let chosenTagsInfo = []
           $("#task-form").find(".chosen-tag").find(".color-div-md").each((index, element) => {
             let catColor = $(element).css("background-color");
-            chosenColorsTask.push(catColor);
+            let textChosen = $(element).next().text()
+            chosenColorsTask.push(catColor)
+            chosenTagsInfo.push({tag: textChosen,color:catColor});
           });
     
           $("#task-form")[0].reset();
@@ -200,11 +203,12 @@ $(document).ready(() => {
                 title: taskTitle,
                 description: taskDescription,
                 colors: chosenColorsTask,
+                tagInfo: chosenTagsInfo,
                 done: false,
               });
               updateLocalStorage()
               $('#todo-items').empty()  
-              // location.reload(true)      
+              location.reload(true)      
         }
        
       });
@@ -304,7 +308,9 @@ $(document).ready(() => {
     let selectedColor = $(this).parent().prev().prev().css("background-color");
     // console.log(selectedColor)
     user.todoInfo.todoTasks.forEach((task, i)=>{
-      if(task.colors.includes(selectedColor)){
+      task.tagInfo.forEach((t)=>{
+        if(t.tag === selectedTag && t.color === selectedColor){
+          //  user.todoInfo.todoTasks[i].tagInfo.splice(i, 1)
           $("#delete-task").css("display", "flex");
           $("#delete-task-details-info").html(`
             <div id="error-delete-cat">
@@ -312,21 +318,44 @@ $(document).ready(() => {
             <p>Unable to delete <span id="delete-task-title">${selectedTag}.</span></p>
             <p>Please remove tasks already assigned to this tag.</p>
             </div>
-            
             `);
-        } else {
-          $("#delete-categories").css("display", "flex");
-          $("#delete-tag").text(selectedTag);
-          $("#delete-tag-color").css("background-color", selectedColor);
-          // delete a tag
-          $("#delete-category-form").on("submit", function (e) {
-            e.preventDefault();
-         console.log('delete item')
-         user.todoInfo.todoTasks.splice(i, 1)
-         updateLocalStorage()
-            $("#delete-categories").hide();
-          });
         }
+        else{
+          $("#delete-categories").css("display", "flex");
+              $("#delete-tag").text(selectedTag);
+              $("#delete-tag-color").css("background-color", selectedColor);
+              // delete a tag
+              $("#delete-category-form").on("submit", function (e) {
+                e.preventDefault();
+             console.log('delete item')
+            //  user.todoInfo.todoTasks[i].tagInfo.splice(i, 1)
+             updateLocalStorage()
+                $("#delete-categories").hide();
+              });
+        }
+      })
+      // if(task.colors.includes(selectedColor)){
+      //     $("#delete-task").css("display", "flex");
+      //     $("#delete-task-details-info").html(`
+      //       <div id="error-delete-cat">
+      //       <p class = "mb-30">Error</p>
+      //       <p>Unable to delete <span id="delete-task-title">${selectedTag}.</span></p>
+      //       <p>Please remove tasks already assigned to this tag.</p>
+      //       </div>
+      //       `);
+      //   } else {
+      //     $("#delete-categories").css("display", "flex");
+      //     $("#delete-tag").text(selectedTag);
+      //     $("#delete-tag-color").css("background-color", selectedColor);
+      //     // delete a tag
+      //     $("#delete-category-form").on("submit", function (e) {
+      //       e.preventDefault();
+      //    console.log('delete item')
+      //    user.todoInfo.todoTasks.splice(i, 1)
+      //    updateLocalStorage()
+      //       $("#delete-categories").hide();
+      //     });
+      //   }
     }) 
           
   });
