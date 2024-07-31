@@ -3,21 +3,20 @@ $(document).ready(() => {
   let currentUser = localStorage.getItem("current-user");
   $("#greeting-msg").text(`${currentUser}'s todos`);
 
-    // Helper functions
-    // get items from local storage
-    function getUsers(){
-      let todoUsers = JSON.parse(localStorage.getItem("todo-users")) || [];
-      return todoUsers
-    }
+  // Helper functions
+  // get items from local storage
+  function getUsers() {
+    let todoUsers = JSON.parse(localStorage.getItem("todo-users")) || [];
+    return todoUsers;
+  }
 
-    function updateLocalStorage(){
-      localStorage.setItem("todo-users", JSON.stringify(todoUsers));
-    }
-    function displayCategories(user) {
-
-          user.todoInfo.categories.forEach((cat) => {
-            let uniqueId = Math.random().toString(16).slice(2)
-             $("#category-list").append(`
+  function updateLocalStorage() {
+    localStorage.setItem("todo-users", JSON.stringify(todoUsers));
+  }
+  function displayCategories(user) {
+    user.todoInfo.categories.forEach((cat) => {
+      let uniqueId = Math.random().toString(16).slice(2);
+      $("#category-list").append(`
          
             <div class="color-div opacity7" data-id = ${uniqueId} style="background-color: ${cat.color};"></div>
          
@@ -36,37 +35,35 @@ $(document).ready(() => {
     </svg>
             </div>
    
-        `)
-  
-                // add availiable categories to task form
-                $("#availiable-categories")
-                .append(`<div class="chosen-color flex align-center gap-10">
+        `);
+
+      // add availiable categories to task form
+      $("#availiable-categories")
+        .append(`<div class="chosen-color flex align-center gap-10">
       <div class="color-div-md" style="background-color: ${cat.color};"></div>
       <p class="category-name-sm">${cat.category}</p>
       </div>`);
-          });
-          if (user.todoInfo.categories.length !== 0) {
-            $("#add-new-task").css("display", "flex");
-          } else {
-            $("#add-new-task").css("display", "none");
-          }
-      
+    });
+    if (user.todoInfo.categories.length !== 0) {
+      $("#add-new-task").css("display", "flex");
+    } else {
+      $("#add-new-task").css("display", "none");
     }
+  }
 
-    function displayTodos(user) {
-            // remove welcome illustration and applied styles
-            if (user.todoInfo.todoTasks.length !== 0) {
-              $("#getstarted").css("display", "none");
-              $("#todo-items").removeClass("justify-center");
-              $("#todo-items").css("height", "fit-content");
-            } else {
-              $("#getstarted").css("display", "flex");
-            }
-          user.todoInfo.todoTasks.forEach((todo, i) => {
-            
-            let checkedValue = todo.done ? "checked" : "";
-            let applyStrikeThrough = todo.done ? true : false;
-            let newCard = $(`<div class="task-card" data-id="${i}">
+  function displayTodos(user) {
+    // remove welcome illustration and applied styles
+    if (user.todoInfo.todoTasks.length !== 0) {
+      $("#getstarted").css("display", "none");
+      $("#todo-items").removeClass("justify-center");
+      $("#todo-items").css("height", "fit-content");
+    } else {
+      $("#getstarted").css("display", "flex");
+    }
+    user.todoInfo.todoTasks.forEach((todo, i) => {
+      let checkedValue = todo.done ? "checked" : "";
+      let applyStrikeThrough = todo.done ? true : false;
+      let newCard = $(`<div class="task-card" data-id="${i}">
               <div style="text-align: end;" class="dropdown-edit-delete">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots dropdown-edit-delete-icon" viewBox="0 0 16 16">
                   <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
@@ -84,25 +81,28 @@ $(document).ready(() => {
               <div class="flex gap-10 color-list-chosen">
               </div>
             </div>`);
-            todo.colors.forEach((color) => {
-              newCard.find(".color-list-chosen").append(`<div class="color-div-md" style="background-color: ${color}"></div>`);
-            });
-            if (applyStrikeThrough) {
-              newCard.find(".task-title").addClass("strike-through");
-              newCard.find(".task-description").addClass("strike-through");
-            }
-            $("#todo-items").append(newCard);
-          });
-   
-    }
+      todo.colors.forEach((color) => {
+        newCard
+          .find(".color-list-chosen")
+          .append(
+            `<div class="color-div-md" style="background-color: ${color}"></div>`
+          );
+      });
+      if (applyStrikeThrough) {
+        newCard.find(".task-title").addClass("strike-through");
+        newCard.find(".task-description").addClass("strike-through");
+      }
+      $("#todo-items").append(newCard);
+    });
+  }
 
-   // Get todos from localStorage
+  // Get todos from localStorage
   let todoUsers = getUsers();
-  todoUsers.forEach((user)=>{
-    if (user.fullName === currentUser) {  
+  todoUsers.forEach((user) => {
+    if (user.fullName === currentUser) {
       displayCategories(user);
       displayTodos(user);
-      
+
       // create categories
       $("#category-form").on("submit", function (e) {
         e.preventDefault();
@@ -112,57 +112,58 @@ $(document).ready(() => {
         } else {
           $("#cat-error").css("display", "none");
           $("#category-input").removeClass("wrong-format");
-    
+
           let category = $("#category-input").val();
           let color = $("#color-picker").val();
-          user.todoInfo.categories.push({ category: category.toLowerCase(), color: color });
-          updateLocalStorage()            
+          user.todoInfo.categories.push({
+            category: category.toLowerCase(),
+            color: color,
+          });
+          updateLocalStorage();
           $("#category-form")[0].reset();
           $("#add-new-task").css("display", "flex");
         }
         location.reload(true);
       });
-    
+
       // open tasks
       $("#add-new-task").click(function () {
-        $("#add-tasks").css('display', 'flex');
+        $("#add-tasks").css("display", "flex");
         $("#task-title").removeClass("wrong-format");
         $("#task-details").removeClass("wrong-format");
         $("#add-task-error").css("display", "none");
         $(".chosen-color").removeClass("chosen-tag");
       });
-    
+
       // filter by categories
       $(document).on("click", ".color-div", function () {
         $(this).next().toggleClass("font-weight");
         let color = $(this).css("background-color");
-             user.todoInfo.todoTasks.forEach((todo, i) => {
-              if (!todo.colors.includes(color)) {
-                $(`[data-id=${i}]`).toggle();
-              }
-            });
-      
-    
+        user.todoInfo.todoTasks.forEach((todo, i) => {
+          if (!todo.colors.includes(color)) {
+            $(`[data-id=${i}]`).toggle();
+          }
+        });
+
         $(this).next().siblings().toggleClass("opacity");
       });
-    
+
       // close category modal
       $("#close").on("click", function () {
         $("#add-categories").hide();
       });
-    
+
       // open category modal
       $("#open-cat").click(function () {
-        $("#add-categories").css('display', 'flex');
+        $("#add-categories").css("display", "flex");
         $("#cat-error").css("display", "none");
         $("#category-input").removeClass("wrong-format");
       });
-    
+
       // close task modal
       $("#close-task").on("click", function () {
         $("#add-tasks").hide();
       });
-    
 
       $("#task-form").on("submit", function (e) {
         e.preventDefault();
@@ -184,96 +185,98 @@ $(document).ready(() => {
         } else {
           $("#task-title").removeClass("wrong-format");
           $("#task-details").removeClass("wrong-format");
-    
+
           let taskTitle = $("#task-title").val();
           let taskDescription = $("#task-details").val();
           let chosenColorsTask = [];
-          let chosenTagsInfo = []
-          $("#task-form").find(".chosen-tag").find(".color-div-md").each((index, element) => {
-            let catColor = $(element).css("background-color");
-            let textChosen = $(element).next().text()
-            chosenColorsTask.push(catColor)
-            chosenTagsInfo.push({tag: textChosen,color:catColor});
-          });
-    
+          let chosenTagsInfo = [];
+          $("#task-form")
+            .find(".chosen-tag")
+            .find(".color-div-md")
+            .each((index, element) => {
+              let catColor = $(element).css("background-color");
+              let textChosen = $(element).next().text();
+              chosenColorsTask.push(catColor);
+              chosenTagsInfo.push({ tag: textChosen, color: catColor });
+            });
+
           $("#task-form")[0].reset();
           $("#add-tasks").hide();
 
-              user.todoInfo.todoTasks.push({
-                title: taskTitle,
-                description: taskDescription,
-                colors: chosenColorsTask,
-                tagInfo: chosenTagsInfo,
-                done: false,
-              });
-              updateLocalStorage()
-              $('#todo-items').empty()  
-              location.reload(true)      
+          user.todoInfo.todoTasks.push({
+            title: taskTitle,
+            description: taskDescription,
+            colors: chosenColorsTask,
+            tagInfo: chosenTagsInfo,
+            done: false,
+          });
+          updateLocalStorage();
+          $("#todo-items").empty();
+          location.reload(true);
         }
-       
       });
-    
+
       // add chosen tag style
       $(document).on("click", ".chosen-color", function () {
         $(this).toggleClass("chosen-tag");
       });
-    
+
       // hide and show edit and delete drop down
       $(document).on("click", ".dropdown-edit-delete-icon", function () {
         $(this).next().toggle();
       });
-    
+
       // delete tasks
       $(document).on("click", ".delete", function () {
+        $(this).parent().hide()
         let id = $(this).parent().parent().parent().data("id");
-            user.todoInfo.todoTasks.splice(id, 1);
-           updateLocalStorage()
-            location.reload(true);
+        user.todoInfo.todoTasks.splice(id, 1);
+        updateLocalStorage();
+        location.reload(true);
       });
-    
+
       // edit tasks
       $(document).on("click", ".edit", function () {
-        $("#add-tasks").css('display', 'flex');
+        $(this).parent().hide()
+        $("#add-tasks").css("display", "flex");
         $("#list-of-tags").css("display", "none");
         let id = $(this).parent().parent().parent().data("id");
-            
-            let todoTasks =  user.todoInfo.todoTasks
-            let todo = user.todoInfo.todoTasks[id];
-            let todoColors = user.todoInfo.todoTasks[id].colors;
-            
-            $("#task-title").val(todo.title);
-            $("#task-details").val(todo.description);
 
+        let todoTasks = user.todoInfo.todoTasks;
+        let todo = user.todoInfo.todoTasks[id];
+        let todoColors = user.todoInfo.todoTasks[id].colors;
 
-            $("#task-form").submit(function (e) {
-              e.preventDefault();
-              let title = $("#task-title").val();
-              let description = $("#task-details").val();
-              todoTasks[id] = {
-                title: title,
-                description: description,
-                done: false,
-                colors: todoColors,
-              }
-              user.todoInfo.todoTasks = todoTasks
-              updateLocalStorage()
-              // location.reload(true);
-            });
-        
+        $("#task-title").val(todo.title);
+        $("#task-details").val(todo.description);
+        $("#task-form").unbind()
+        $("#task-form").submit(function (e) {
+          e.preventDefault();
+          let title = $("#task-title").val();
+          let description = $("#task-details").val();
+          todoTasks[id] = {
+            title: title,
+            description: description,
+            done: false,
+            colors: todoColors,
+          };
+          user.todoInfo.todoTasks = todoTasks;
+          updateLocalStorage();
+          location.reload(true);
+        });
       });
-    
+
       // mark task as done
       $(document).on("click", ".check-task", function () {
         let id = $(this).closest(".task-card").data("id");
 
-            let todo = user.todoInfo.todoTasks[id];
-            todo.done = this.checked;
-            updateLocalStorage()
-            $('#todo-items').empty()
-                
-        location.reload(true)
+        let todo = user.todoInfo.todoTasks[id];
+        todo.done = this.checked;
+        updateLocalStorage();
+        $("#todo-items").empty();
+
+        location.reload(true);
       });
-    
+
       // hide all finished tasks
       $(document).on("click", "#done-tasks", function () {
         $(".task-card").each(function () {
@@ -282,35 +285,85 @@ $(document).ready(() => {
           }
         });
       });
-    
+
       //others
-       // show edit and delete tag options
-       $(document).on("click", ".edit-delete-tag-menu-icon", function () {
+      // show edit and delete tag options
+      $(document).on("click", ".edit-delete-tag-menu-icon", function () {
         $(this).siblings().toggle("fast");
       });
-    
+
       // dropdown menu for responsiveness
       $("#category-menu").click(function () {
         $("#categories").toggle("slow");
       });
       // remove edit and delete task button once document is clicked
       $(document).click(function (e) {
-        if (e.target.classList.contains("dropdown-edit-delete-icon") === false) {
+        if (
+          e.target.classList.contains("dropdown-edit-delete-icon") === false
+        ) {
           $(".dropdown-edit-delete-list").addClass("display-none");
         }
       });
-    
-    // open delete tag modal
-  $(document).on("click", ".delete-tag-icon", function () {
-    $(this).css("display", "none");
-    $(this).prev().css("display", "none");
-    let selectedTag = $(this).parent().prev().text();
-    let selectedColor = $(this).parent().prev().prev().css("background-color");
-    // console.log(selectedColor)
-    user.todoInfo.todoTasks.forEach((task, i)=>{
-      task.tagInfo.forEach((t)=>{
-        if(t.tag === selectedTag && t.color === selectedColor){
-          //  user.todoInfo.todoTasks[i].tagInfo.splice(i, 1)
+
+      // edit tag 
+      $(document).on('click', '.edit-tag-icon', function(){
+        $("#add-categories").css("display", "flex");
+        $("#cat-error").css("display", "none");
+        $("#category-input").removeClass("wrong-format");
+        let selectedTag = $(this).parent().prev().text();
+        let selectedColor = $(this).parent().prev().prev().css('background-color');
+        $("#category-input").val(selectedTag);
+        $('#color-picker').val(`${$.Color(selectedColor).toHexString()}`)
+      
+        // edit categories
+        $("#category-form").unbind()
+      $("#category-form").on("submit", function (e) {
+        e.preventDefault();
+        if ($("#category-input").val() === "") {
+          $("#cat-error").css("display", "block");
+          $("#category-input").addClass("wrong-format");
+        } else {
+          $("#cat-error").css("display", "none");
+          $("#category-input").removeClass("wrong-format");
+
+          let category = $("#category-input").val();
+          let color = $("#color-picker").val();
+
+          console.log(category)
+          console.log(color)
+          // user.todoInfo.categories.push({
+          //   category: category.toLowerCase(),
+          //   color: color,
+          // });
+          // updateLocalStorage();
+          // $("#category-form")[0].reset();
+          // $("#add-new-task").css("display", "flex");
+        }
+        // location.reload(true);
+      });
+      })
+
+
+
+
+      // delete tag modal
+      $(document).on("click", ".delete-tag-icon", function () {
+        $(this).css("display", "none");
+        $(this).prev().css("display", "none");
+        let selectedTag = $(this).parent().prev().text();
+        let selectedColor = $(this)
+          .parent()
+          .prev()
+          .prev()
+          .css("background-color");
+        // console.log(selectedColor)
+        let colorsPresent = 0;
+        user.todoInfo.todoTasks.forEach((task, i) => {
+          if (task.colors.includes(selectedColor)) {
+            colorsPresent++;
+          }
+        });
+        if (colorsPresent > 0) {
           $("#delete-task").css("display", "flex");
           $("#delete-task-details-info").html(`
             <div id="error-delete-cat">
@@ -319,91 +372,43 @@ $(document).ready(() => {
             <p>Please remove tasks already assigned to this tag.</p>
             </div>
             `);
-        }
-        else{
-          $("#delete-categories").css("display", "flex");
-              $("#delete-tag").text(selectedTag);
-              $("#delete-tag-color").css("background-color", selectedColor);
-              // delete a tag
-              $("#delete-category-form").on("submit", function (e) {
-                e.preventDefault();
-             console.log('delete item')
-            //  user.todoInfo.todoTasks[i].tagInfo.splice(i, 1)
-             updateLocalStorage()
-                $("#delete-categories").hide();
-              });
-        }
-      })
-      // if(task.colors.includes(selectedColor)){
-      //     $("#delete-task").css("display", "flex");
-      //     $("#delete-task-details-info").html(`
-      //       <div id="error-delete-cat">
-      //       <p class = "mb-30">Error</p>
-      //       <p>Unable to delete <span id="delete-task-title">${selectedTag}.</span></p>
-      //       <p>Please remove tasks already assigned to this tag.</p>
-      //       </div>
-      //       `);
-      //   } else {
-      //     $("#delete-categories").css("display", "flex");
-      //     $("#delete-tag").text(selectedTag);
-      //     $("#delete-tag-color").css("background-color", selectedColor);
-      //     // delete a tag
-      //     $("#delete-category-form").on("submit", function (e) {
-      //       e.preventDefault();
-      //    console.log('delete item')
-      //    user.todoInfo.todoTasks.splice(i, 1)
-      //    updateLocalStorage()
-      //       $("#delete-categories").hide();
-      //     });
-      //   }
-    }) 
-          
-  });
-    
-    
-      // close delete task modal
-  $("#close-delete-task").on("click", function () {
-    $("#delete-task").hide();
-  });
+        } else {
+          console.log("we can delete");
+          let indexTag = null;
+          user.todoInfo.categories.forEach((cat, i) => {
+            if (cat.category === selectedTag) {
+              indexTag = i;
+            }
+          });
 
-    // close delete category modal
-    $("#close-delete").on("click", function () {
-      $("#delete-categories").hide();
-    });
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+          $("#delete-categories").css("display", "flex");
+          $("#delete-tag").text(selectedTag);
+          $("#delete-tag-color").css("background-color", selectedColor);
+          // delete a tag
+          $("#delete-category-form").on("submit", function (e) {
+            e.preventDefault();
+            console.log("delete item");
+            user.todoInfo.categories.splice(indexTag, 1);
+            updateLocalStorage();
+            $("#delete-categories").hide();
+            location.reload(true)
+          });
+        }
+      });
+
+      // close delete task modal
+      $("#close-delete-task").on("click", function () {
+        $("#delete-task").hide();
+      });
+
+      // close delete category modal
+      $("#close-delete").on("click", function () {
+        $("#delete-categories").hide();
+      });
+
       $("#logout-btn").click(() => {
         window.location.href = "index.html";
       });
-      }
-    
-  })
-
-
+    }
+  });
 });
