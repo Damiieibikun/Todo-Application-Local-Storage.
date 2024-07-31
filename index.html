@@ -28,26 +28,32 @@
             <div class="flex-col justify-center align-center">
                 <h2 class="lg-txt" style="text-align: center; margin-bottom: 20px;">Register Details</h2>
             
-                <form action="" class="flex-col justify-center align-center gap-20" id="registration-form">
+                <form action="" class="flex-col justify-center align-center gap-25" id="registration-form">
     
                     <span class="error-msg" id="empty-field">Empty Field</span>
+                    <div class="flex-col justify-center align-center form-inputs">
+                        <input type="text" placeholder="Full Name" id="name" class="right-format">
+                    </div>
     
-                    <input type="text" placeholder="Name" id="name" class="right-format">
-                    <div class="flex-col justify-center align-center">
+                    
+                    <div class="flex-col justify-center align-center form-inputs">
                         <span class="error-msg">Wrong Email Format</span>
                         <input type="text" placeholder="Email" id="email" class="right-format">
                     </div>
+
+                    <div class="flex-col justify-center align-center form-inputs">
+                        <input type="text" placeholder="Username" id="username" class="right-format">
+                    </div>   
     
-    
-                    <input type="text" placeholder="Username" id="username" class="right-format">
-                    <div class="flex-col justify-center align-center">
+                    
+                    <div class="flex-col justify-center align-center form-inputs">
                         <span class="error-msg">Password must be at least 8 characters and contain letters and numbers</span>
-                        <input type="text" placeholder="Password" id="password" class="right-format">
+                        <input type="password" placeholder="Password" id="password" class="right-format" style="margin: 20px 0;">
                     </div>
     
-                    <div class="flex-col justify-center align-center">
+                    <div class="flex-col justify-center align-center form-inputs">
                         <span class="error-msg">Incorrect Password</span>
-                        <input type="text" placeholder="Confirm Password" id="confirm-password" class="right-format">
+                        <input type="password" placeholder="Confirm Password" id="confirm-password" class="right-format">
                     </div>
     
     
@@ -67,7 +73,7 @@
             <form action="" class="flex-col justify-center align-center gap-10" id="login-form">
                 <span class="error-msg" id="empty-field-login">Empty Field</span>
                 <input type="text" placeholder="Username" class="right-format" id="login-username">
-                <input type="text" placeholder="Password" class="right-format" id="login-password">
+                <input type="password" placeholder="Password" class="right-format" id="login-password">
 
                 <span class="small-text">Not Registered? <a href="#" id="signup-link">Sign Up</a></span>
 

@@ -1,7 +1,7 @@
 $(document).ready(() => {
   // Get current user and display welcome message
   let currentUser = localStorage.getItem("current-user");
-  $("#greeting-msg").text(`${currentUser}'s todos`);
+  $("#greeting-msg").text(`${currentUser.split(' ')[0]}'s todos`);
 
   // Helper functions
   // get items from local storage
@@ -122,8 +122,9 @@ $(document).ready(() => {
           updateLocalStorage();
           $("#category-form")[0].reset();
           $("#add-new-task").css("display", "flex");
+          location.reload(true);
         }
-        location.reload(true);
+        
       });
 
       // open tasks
@@ -138,7 +139,8 @@ $(document).ready(() => {
       // filter by categories
       $(document).on("click", ".color-div", function () {
         $(this).next().toggleClass("font-weight");
-        let color = $(this).css("background-color");
+        $(this).toggleClass("opacity7");
+        let color = $.Color($(this).css("background-color")).toHexString();
         user.todoInfo.todoTasks.forEach((todo, i) => {
           if (!todo.colors.includes(color)) {
             $(`[data-id=${i}]`).toggle();
@@ -165,6 +167,7 @@ $(document).ready(() => {
         $("#add-tasks").hide();
       });
 
+      // create task
       $("#task-form").on("submit", function (e) {
         e.preventDefault();
         if ($("#task-title").val() === "" && $("#task-details").val() === "") {
@@ -196,13 +199,15 @@ $(document).ready(() => {
             .each((index, element) => {
               let catColor = $(element).css("background-color");
               let textChosen = $(element).next().text();
-              chosenColorsTask.push(catColor);
+              chosenColorsTask.push($.Color(catColor).toHexString());
               chosenTagsInfo.push({ tag: textChosen, color: catColor });
             });
 
+          // Reset form and hide add-tasks modal
           $("#task-form")[0].reset();
           $("#add-tasks").hide();
 
+          // Push new task into todoTasks
           user.todoInfo.todoTasks.push({
             title: taskTitle,
             description: taskDescription,
@@ -210,13 +215,19 @@ $(document).ready(() => {
             tagInfo: chosenTagsInfo,
             done: false,
           });
+
+        
+          // Update localStorage
           updateLocalStorage();
+
+          // Reload or re-render tasks
           $("#todo-items").empty();
           location.reload(true);
         }
       });
 
       // add chosen tag style
+
       $(document).on("click", ".chosen-color", function () {
         $(this).toggleClass("chosen-tag");
       });
@@ -228,7 +239,7 @@ $(document).ready(() => {
 
       // delete tasks
       $(document).on("click", ".delete", function () {
-        $(this).parent().hide()
+        $(this).parent().hide();
         let id = $(this).parent().parent().parent().data("id");
         user.todoInfo.todoTasks.splice(id, 1);
         updateLocalStorage();
@@ -237,7 +248,7 @@ $(document).ready(() => {
 
       // edit tasks
       $(document).on("click", ".edit", function () {
-        $(this).parent().hide()
+        $(this).parent().hide();
         $("#add-tasks").css("display", "flex");
         $("#list-of-tags").css("display", "none");
         let id = $(this).parent().parent().parent().data("id");
@@ -248,7 +259,7 @@ $(document).ready(() => {
 
         $("#task-title").val(todo.title);
         $("#task-details").val(todo.description);
-        $("#task-form").unbind()
+        $("#task-form").unbind();
         $("#task-form").submit(function (e) {
           e.preventDefault();
           let title = $("#task-title").val();
@@ -305,46 +316,67 @@ $(document).ready(() => {
         }
       });
 
-      // edit tag 
-      $(document).on('click', '.edit-tag-icon', function(){
+      // edit tag
+      $(document).on("click", ".edit-tag-icon", function () {
         $("#add-categories").css("display", "flex");
         $("#cat-error").css("display", "none");
         $("#category-input").removeClass("wrong-format");
         let selectedTag = $(this).parent().prev().text();
-        let selectedColor = $(this).parent().prev().prev().css('background-color');
+        let selectedColor = $(this)
+          .parent()
+          .prev()
+          .prev()
+          .css("background-color");
         $("#category-input").val(selectedTag);
-        $('#color-picker').val(`${$.Color(selectedColor).toHexString()}`)
-      
-        // edit categories
-        $("#category-form").unbind()
-      $("#category-form").on("submit", function (e) {
-        e.preventDefault();
-        if ($("#category-input").val() === "") {
-          $("#cat-error").css("display", "block");
-          $("#category-input").addClass("wrong-format");
-        } else {
-          $("#cat-error").css("display", "none");
-          $("#category-input").removeClass("wrong-format");
+        $("#color-picker").val(`${$.Color(selectedColor).toHexString()}`);
 
-          let category = $("#category-input").val();
-          let color = $("#color-picker").val();
+        user.todoInfo.categories.forEach((cat, i) => {
+          if (
+            cat.category === selectedTag &&
+            cat.color === $.Color(selectedColor).toHexString()
+          ) {
+            // edit categories
+            $("#category-form").unbind();
+            $("#category-form").on("submit", function (e) {
+              e.preventDefault();
+              if ($("#category-input").val() === "") {
+                $("#cat-error").css("display", "block");
+                $("#category-input").addClass("wrong-format");
+              } else {
+                $("#cat-error").css("display", "none");
+                $("#category-input").removeClass("wrong-format");
 
-          console.log(category)
-          console.log(color)
-          // user.todoInfo.categories.push({
-          //   category: category.toLowerCase(),
-          //   color: color,
-          // });
-          // updateLocalStorage();
-          // $("#category-form")[0].reset();
-          // $("#add-new-task").css("display", "flex");
-        }
-        // location.reload(true);
+                let category = $("#category-input").val();
+                let color = $("#color-picker").val();
+
+                user.todoInfo.categories[i] = {
+                  category: category,
+                  color: color,
+                };
+
+                // change color in tasks
+                user.todoInfo.todoTasks.forEach((task, index) => {
+                  // console.log(task)
+                  task.colors.forEach((c, inx) => {
+                    console.log(`Colors in LS: ${c}`);
+                    console.log(
+                      `Selected: ${$.Color(selectedColor).toHexString()}`
+                    );
+                    if (c === $.Color(selectedColor).toHexString()) {
+                      user.todoInfo.todoTasks[index].colors[inx] = color;
+                    }
+                  });
+                });
+
+                updateLocalStorage();
+                $("#category-form")[0].reset();
+                $("#add-new-task").css("display", "flex");
+              }
+              location.reload(true);
+            });
+          }
+        });
       });
-      })
-
-
-
 
       // delete tag modal
       $(document).on("click", ".delete-tag-icon", function () {
@@ -391,7 +423,7 @@ $(document).ready(() => {
             user.todoInfo.categories.splice(indexTag, 1);
             updateLocalStorage();
             $("#delete-categories").hide();
-            location.reload(true)
+            location.reload(true);
           });
         }
       });
